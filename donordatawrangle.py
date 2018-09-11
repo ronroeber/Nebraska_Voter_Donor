@@ -63,9 +63,30 @@ for pointer in directions:
     donors['ContributorAddress'] = donors['ContributorAddress'].str.replace(pointer, pointer[0])
 
 # Standardize street names
-streets ={'STREET':'ST', 'AVENUE':'AVE', 'ROAD':'RD', 'CIRCLE':'CR', 'ROUTE':'RTE', 'PLACE':'PLA', 'PLAZA':'PLZ', 'PARKWAY':'PKWY', 'COURT','CT'}
+streets ={'STREET':'ST', 'AVENUE':'AVE', 'ROAD':'RD', 'CIRCLE':'CR', 'ROUTE':'RTE', 'PLACE':'PLA', 'PLAZA':'PLZ', 'PARKWAY':'PKWY', 'COURT','CT', 'LANE':'LN', 'TERRACE':'TER', 'TRAIL':'TRL', 'COVE':'CV', 'DRIVE':'DR'}
 for way in streets.keys():
     donors['ContributorAddress'] = donors['ContributorAddress'].str.replace(way, streets[way])
+
+# Create Total Contribution Column from Cash and InKind contributions
+nan2zero = ['InKindContribution', 'CashContribution']
+for gift in nan2zero:
+    donors[gift].fillna(0, inplace=True)
+donors['TotalContribution'] = donors.CashContribution + donors.InKindContribution
+
+# set up Donation years. A lot of options here:
+# 1) Could set date range to match election cycle (primary, general, etc)
+# 2) Could round to Closest future even numbered year
+# 3) Just use year - First I will do this. then will work on the round
+
+# Add column for year of donation - start with Contribution Date
+# NEED TO CLEAN UP DATES
+donors['ContributionYear'] = donors['DateReceived'].dt.year
+
+# Create a new column for each unique year and fill it with total donation from that year
+for yr in donors.ContributionYear.unique():
+    donors[yr] = (donors['TotalContribution'].where(donors['ContributionYear'] == yr))
+for yr in donors.ContributionYear.unique():
+    donors[yr].fillna(0, inplace=True)
 
 # Filter the dataframe to hone in on individuals to match voterfile
 # Define Filters
@@ -76,3 +97,8 @@ Filter4 = donors.ContributorState =='NE' # lost some. need to look for blank sta
 
 # Create wrangling database to fix up 
 wrangleD = donors[Filter1 & (Filter2 | Filter3) & Filter4]
+
+# Write Excel File of donor 'cleaner' donor data
+writer = pd.ExcelWriter('Donors2.xlsx')
+donors.to_excel(writer,'Donors2')
+writer.save()
