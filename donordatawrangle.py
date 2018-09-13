@@ -63,7 +63,7 @@ for pointer in directions:
     donors['ContributorAddress'] = donors['ContributorAddress'].str.replace(pointer, pointer[0])
 
 # Standardize street names
-streets ={'STREET':'ST', 'AVENUE':'AVE', 'ROAD':'RD', 'CIRCLE':'CR', 'ROUTE':'RTE', 'PLACE':'PLA', 'PLAZA':'PLZ', 'PARKWAY':'PKWY', 'COURT','CT', 'LANE':'LN', 'TERRACE':'TER', 'TRAIL':'TRL', 'COVE':'CV', 'DRIVE':'DR'}
+streets ={'STREET':'ST', 'AVENUE':'AVE', 'ROAD':'RD', 'CIRCLE':'CR', 'ROUTE':'RTE', 'PLACE':'PLA', 'PLAZA':'PLZ', 'PARKWAY':'PKWY', 'COURT':'CT', 'LANE':'LN', 'TERRACE':'TER', 'TRAIL':'TRL', 'COVE':'CV', 'DRIVE':'DR'}
 for way in streets.keys():
     donors['ContributorAddress'] = donors['ContributorAddress'].str.replace(way, streets[way])
 
